@@ -30,3 +30,82 @@ architecture Behavioral of blink is
 end Behavioral;
 
 
+
+
+
+
+
+
+
+library IEEE;
+use IEEE.std_logic_1164.all;
+use IEEE.numeric_std.all;
+use IEEE.std_logic_unsigned.all;
+
+entity blink is
+    port (
+        g_clock_50: in std_logic;
+        v_sw  : in std_logic_vector (9 downto 0); -- 10 interruptores
+        v_bt  : in std_logic_vector (3 downto 0); -- 4 botones
+        g_led : out std_logic_vector(9 downto 0); -- 10 LEDs
+        g_hex0 : out std_logic_vector(6 downto 0); -- 7-segmentos 0
+        g_hex1 : out std_logic_vector(6 downto 0); -- 7-segmentos 1
+        g_hex2 : out std_logic_vector(6 downto 0); -- 7-segmentos 2
+        g_hex3 : out std_logic_vector(6 downto 0); -- 7-segmentos 3
+        g_hex4 : out std_logic_vector(6 downto 0); -- 7-segmentos 4
+        g_hex5 : out std_logic_vector(6 downto 0) -- 7-segmentos 5    
+	);
+end blink;
+
+architecture Behavioral of blink is
+    --Declaración de nuestras e/s como signals
+    signal reg_a: std_logic_vector(3 downto 0);
+    signal reg_b: std_logic_vector(3 downto 0);
+    signal alu: std_logic_vector (1 downto 0);
+    signal resul: std_logic_vector (3 downto 0);
+    signal seven_seg: std_logic_vector (6 downto 0);
+    signal fz: std_logic;
+
+    begin
+    
+    --asignación de signals, entradas y salidas
+    reg_a<=v_sw(3 downto 0);
+    reg_b<=v_sw(9 downto 6);
+    alu<=v_sw(5 downto 4);
+    g_led(3 downto 0)<=resul;
+    g_led(15)<=fz;
+    g_hex0<=seven_seg;
+    g_hex1<="1111111";
+    g_hex2<="1111111";
+    g_hex3<="1111111";
+    g_hex4<="1111111";
+    g_hex5<="1111111";
+
+    
+    process(reg_a, reg_b, alu)
+    begin
+    case alu is
+        when "000" => resul<=reg_a+reg_b;
+        when "001" => resul<=reg_a xor reg_b;
+        when "010" => resul<=reg_b;
+        when "011" => resul<=not reg_a;
+        when "100" => resul<=reg_a-reg_b;
+        when "101" => resul<=;
+        when "110" => result<=;
+        when others => resul<="0000"; --no debe darse
+    end case;
+    end process;
+    
+    process(resul)
+    begin
+    if resul="0000000000000000" then
+        fz<='1';
+    else
+        fz<='0';
+    end if;
+    end process;
+
+end Behavioral;
+
+
+

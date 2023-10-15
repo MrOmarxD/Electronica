@@ -1,0 +1,218 @@
+Opción 1:
+
+library IEEE;
+use IEEE.std_logic_1164.all;
+use IEEE.numeric_std.all;
+use IEEE.std_logic_unsigned.all;
+
+entity blink is
+    port (
+        g_clock_50: in std_logic;
+        v_sw  : in std_logic_vector (9 downto 0); -- 10 interruptores
+        v_bt  : in std_logic_vector (3 downto 0); -- 4 botones
+        g_led : out std_logic_vector(9 downto 0); -- 10 LEDs
+        g_hex0 : out std_logic_vector(6 downto 0); -- 7-segmentos 0
+        g_hex1 : out std_logic_vector(6 downto 0); -- 7-segmentos 1
+        g_hex2 : out std_logic_vector(6 downto 0); -- 7-segmentos 2
+        g_hex3 : out std_logic_vector(6 downto 0); -- 7-segmentos 3
+        g_hex4 : out std_logic_vector(6 downto 0); -- 7-segmentos 4
+        g_hex5 : out std_logic_vector(6 downto 0) -- 7-segmentos 5    
+	);
+end blink;
+
+architecture Behavioral of blink is
+    --Declaración de nuestras e/s como signals
+    signal reg_a: std_logic_vector(2 downto 0);
+    signal reg_b: std_logic_vector(2 downto 0);
+    signal resul: std_logic_vector(2 downto 0);
+    signal alu: std_logic_vector(2 downto 0);
+    signal seven_seg: std_logic_vector(6 downto 0);
+begin
+    reg_a <= v_sw(2 downto 0); -- Asignación de reg_a
+    reg_b <= v_sw(5 downto 3); -- Asignación de reg_b
+    alu <= v_sw(8 downto 6); -- Asignación de alu
+    g_led(2 downto 0)<=resul;
+    g_hex0<=seven_seg;
+    g_hex1 <= "1111111"; -- apagados
+    g_hex2 <= "1111111";
+    g_hex3 <= "1111111";
+    g_hex4 <= "1111111";
+    g_hex5 <= "1111111";
+
+    process (reg_a, reg_b, alu)
+    begin
+        case alu is
+            when "000" =>
+                resul <= reg_a + reg_b;
+            when "001" =>
+                resul <= reg_a xor reg_b;
+            when "010" =>
+                resul <= reg_b;
+            when "011" =>
+                resul <= not reg_a;
+            when "100" =>
+                resul <= reg_a - reg_b;
+            when "101"=>
+                resul<= not reg_b;
+            when "110"=>
+                resul<=reg_a xnor reg_b;
+            when others =>
+                resul <= (others => '0');
+        end case;
+    end process;
+    
+    process (resul)
+    begin
+        case resul is
+            when "000" =>
+                seven_seg <= "1000000";
+            when "001" =>
+                seven_seg <= "1111001";
+            when "010" =>
+                seven_seg <= "0100100";
+            when "011" =>
+                seven_seg <= "0110000";
+            when "100" =>
+                seven_seg <= "0011001";
+            when "101"=>
+                seven_seg<= "0010010";
+            when "110"=>
+                seven_seg<= "0000010";
+            when "111"=>
+                seven_seg<= "1111000";
+        end case;
+    end process;
+end Behavioral;
+
+------------------------------------------------------------------------------
+
+Opción 2:
+
+library IEEE;
+use IEEE.std_logic_1164.all;
+use IEEE.numeric_std.all;
+use IEEE.std_logic_unsigned.all;
+
+entity blink is
+    port (
+        g_clock_50: in std_logic;
+        v_sw  : in std_logic_vector (9 downto 0); -- 10 interruptores
+        v_bt  : in std_logic_vector (3 downto 0); -- 4 botones
+        g_led : out std_logic_vector(9 downto 0); -- 10 LEDs
+        g_hex0 : out std_logic_vector(6 downto 0); -- 7-segmentos 0
+        g_hex1 : out std_logic_vector(6 downto 0); -- 7-segmentos 1
+        g_hex2 : out std_logic_vector(6 downto 0); -- 7-segmentos 2
+        g_hex3 : out std_logic_vector(6 downto 0); -- 7-segmentos 3
+        g_hex4 : out std_logic_vector(6 downto 0); -- 7-segmentos 4
+        g_hex5 : out std_logic_vector(6 downto 0) -- 7-segmentos 5
+	);
+end blink;
+
+architecture Behavioral of blink is
+    --Declaración de nuestras e/s como signals
+    signal reg_a: std_logic_vector(2 downto 0);
+    signal reg_b: std_logic_vector(2 downto 0);
+    signal resul: std_logic_vector(2 downto 0);
+    signal alu: std_logic_vector(2 downto 0);
+    signal seven_seg: std_logic_vector(6 downto 0);
+    signal fz: std_logic;
+    signal fn: std_logic;
+    signal fo: std_logic;
+    signal fp: std_logic;
+begin
+    reg_a <= v_sw(2 downto 0); -- Asignación de reg_a
+    reg_b <= v_sw(5 downto 3); -- Asignación de reg_b
+    alu <= v_sw(8 downto 6); -- Asignación de alu
+    g_led(2 downto 0)<=resul;
+    g_hex0<=seven_seg;
+    g_hex1 <= "1111111"; -- apagados
+    g_hex2 <= "1111111";
+    g_hex3 <= "1111111";
+    g_hex4 <= "1111111";
+    g_hex5 <= "1111111";
+    --g_led(6) <= fp;
+    g_led(7) <= fo;
+    --g_led(8) <= fn;
+    --g_led(9) <= fz;
+
+    process (reg_a, reg_b, alu)
+    begin
+        case alu is
+            when "000" =>
+                resul <= reg_a + reg_b;
+            when "001" =>
+                resul <= reg_a xor reg_b;
+            when "010" =>
+                resul <= reg_b;
+            when "011" =>
+                resul <= not reg_a;
+            when "100" =>
+                resul <= reg_a - reg_b;
+            when "101"=>
+                resul<= not reg_b;
+            when "110"=>
+                resul<=reg_a xnor reg_b;
+            when others =>
+                resul <= (others => '0');
+        end case;
+    end process;
+    
+    process (resul)
+    begin
+        case resul is
+            when "000" =>
+                seven_seg <= "1000000";
+            when "001" =>
+                seven_seg <= "1111001";
+            when "010" =>
+                seven_seg <= "0100100";
+            when "011" =>
+                seven_seg <= "0110000";
+            when "100" =>
+                seven_seg <= "0011001";
+            when "101"=>
+                seven_seg<= "0010010";
+            when "110"=>
+                seven_seg<= "0000010";
+            when "111"=>
+                seven_seg<= "1111000";
+        end case;
+    end process;
+    
+    process (resul)
+    begin
+        -- Flag fz (se pone a 1 si resul es 0)
+        if resul = "0" then
+            fz <= '1';
+        else
+            fz <= '0';
+        end if;
+        
+        -- Flag fp (se pone a 1 si resul es par)
+        if resul(0) = '0' then
+            fp <= '1';
+        else
+            fp <= '0';
+        end if;
+        
+         -- Flag fo (se pone a 1 si se ha producido un desbordamiento)
+        if (resul(2) /= (reg_a(2) and reg_b(2))) then
+            fo <= '1';
+        else
+            fo <= '0';
+        end if;
+        if reg_a(2) = '0' AND reg_b(2) = '0' AND resul(2) = '1' then
+            fo <= '1'; 
+        elsif  reg_a(2) = '1' AND reg_b(2) = '1' AND resul(2) = '0' then
+            fo <='1';
+        else
+            fo <='0';
+        end if;
+        -- Flag fn (se pone a 1 si el resultado es negativo)
+        if resul(2) = '1' and not(reg_a(2) = '1') then
+            fn <= '1';
+        else
+            fn <= '0';
+        end if;
+    end process;
+end Behavioral;
