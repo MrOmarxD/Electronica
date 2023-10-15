@@ -130,10 +130,10 @@ begin
     g_hex3 <= "1111111";
     g_hex4 <= "1111111";
     g_hex5 <= "1111111";
-    --g_led(6) <= fp;
+    g_led(6) <= fp;
     g_led(7) <= fo;
-    --g_led(8) <= fn;
-    --g_led(9) <= fz;
+    g_led(8) <= fn;
+    g_led(9) <= fz;
 
     process (reg_a, reg_b, alu)
     begin
@@ -196,11 +196,6 @@ begin
         end if;
         
          -- Flag fo (se pone a 1 si se ha producido un desbordamiento)
-        if (resul(2) /= (reg_a(2) and reg_b(2))) then
-            fo <= '1';
-        else
-            fo <= '0';
-        end if;
         if reg_a(2) = '0' AND reg_b(2) = '0' AND resul(2) = '1' then
             fo <= '1'; 
         elsif  reg_a(2) = '1' AND reg_b(2) = '1' AND resul(2) = '0' then
